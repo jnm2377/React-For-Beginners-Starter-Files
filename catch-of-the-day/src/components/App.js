@@ -4,6 +4,7 @@ import Inventory from './Inventory.js';
 import Order from './Order.js';
 import fishes from '../sample-fishes';
 import Fish from './Fish.js';
+import base from '../base';
 
 class App extends React.Component {
   //INITIAL STATE
@@ -12,6 +13,21 @@ class App extends React.Component {
     fishes: {},
     order: {}
   };
+
+
+//LIFECYCLE METHOD
+  componentDidMount() {
+    // firebase stuff
+    const { params } = this.props.match;
+    this.ref = base.syncState(`${params.storeId}/fishes`, {
+      context: this,
+      state: 'fishes'
+    });
+  }
+
+  componentWillUnmount() {
+    base.removeBinding(this.ref);
+  }
 
   //UPDATING STATE
   addFish = (fish) => {
@@ -58,7 +74,7 @@ class App extends React.Component {
             ))}
           </ul>
         </div>
-        <Order/>
+        <Order fishes={this.state.fishes} order={this.state.order}/>
         <Inventory addFish={this.addFish} loadSampleFishes={this.loadSampleFishes}/>
         {/* ^^^Added prop for updating state to be accessed in this component class (Ineventory.js)*/}
       </div>
